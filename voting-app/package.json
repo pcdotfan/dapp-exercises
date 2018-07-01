@@ -1,0 +1,12 @@
+{
+  "name": "voting-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "PCDotFan",
+  "license": "MIT",
+  "dependencies": {
+    "ganache-cli": "^6.1.4",
+    "solc": "^0.4.24",
+    "web3": "^1.0.0-beta.34"
+  }
+}
