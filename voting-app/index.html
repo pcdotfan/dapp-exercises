@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="uk-background-primary">
+    <head>
+        <title>Dapp Exercises - Voting</title>
+        <link href="https://cdn.bootcss.com/uikit/3.0.0-rc.3/css/uikit.min.css" rel="stylesheet">
+        <script src="https://cdn.bootcss.com/vue/2.5.17-beta.0/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/web3@0.20.6/dist/web3.min.js"></script>
+    </head>
+    <style>
+        html {
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+        .control-box {
+            max-width: 640px;
+            margin: 0 auto;
+            margin-top: 100px;
+        }
+    </style>
+    <body >
+        <div id="app" class="uk-container">
+            <div class="control-box uk-card uk-card-default">
+                <div class="uk-card-header">
+                    <h3>候选人名单</h3>
+                </div>
+                <div class="uk-card-body">
+                    <table class="uk-table uk-table-justify uk-table-divider">
+                        <thead>
+                            <tr>
+                                <th class="uk-width-small">姓名</th>
+                                <th>票数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="candidate in candidates" :key="candidate.id">
+                                <td v-text="candidate.name"></td>
+                                <td v-text="getTotalVotes(candidate.name)"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="uk-card-footer">
+                    <p class="uk-text-right">
+                        <button class="uk-button uk-button-primary" @click="voteForCandidate">投票</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"))
+        const abiDefinition = JSON.parse('[{"constant":true,"inputs":[{"name":"candidate","type":"bytes32"}],"name":"totalVotesFor","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"candidate","type":"bytes32"}],"name":"validCandidate","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"votesReceived","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"candidate","type":"bytes32"}],"name":"vote","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"candidateList","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"candidateNames","type":"bytes32[]"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]')
+        const VotingContract = web3.eth.contract(abiDefinition)
+        const app = new Vue({
+            el: '#app',
+            data: {
+                contractInstance: VotingContract.at('0x2596Ff8D1C07f5a2d771Fe76cfe54cb99bc25769'),
+                account: '0x2596Ff8D1C07f5a2d771Fe76cfe54cb99bc25769',
+                candidates: [
+                    { id: 0, name: 'PCDotFan' },
+                    { id: 1, name: 'Jose' },
+                    { id: 2, name: 'Lussiun' },
+                    { id: 3, name: 'Rosemary' }
+                ]
+            },
+            created: function() {
+            },
+            methods: {
+                voteForCandidate: function () {
+                    candidateName = 'PCDotFan'
+                    this.contractInstance.vote(candidateName, { from: this.account }, () => {
+                        console.log('done')
+                    });
+                },
+                getTotalVotes(name) {
+                    return this.contractInstance.totalVotesFor.call(name).toString();
+                }
+            }
+        })
+    </script>
+</html>
